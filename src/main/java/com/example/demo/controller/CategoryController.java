@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import java.util.List;
 
 import static java.util.Objects.isNull;
@@ -42,7 +43,7 @@ public class CategoryController {
 
     @PostMapping(value = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public CategoryDto save(
-            @RequestPart(name = "name", required = true) String name,
+            @RequestPart(name = "name") String name,
             @RequestPart(name = "description", required = false) String description,
             @RequestPart(name = "img", required = false) MultipartFile image
     ) throws ValidationException {

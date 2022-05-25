@@ -1,17 +1,14 @@
 package com.example.demo.entity;
 
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import javax.persistence.*;
-
 @Entity
-@Table(name = "categories")
+@Table(name = "publishers")
 @Data
 @NoArgsConstructor
-public class Category {
+public class Publisher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
