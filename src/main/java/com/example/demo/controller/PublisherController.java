@@ -7,6 +7,7 @@ import com.example.demo.service.PublisherService;
 import com.example.demo.service.ImageService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -64,5 +65,11 @@ public class PublisherController {
         log.info("Handling delete publisher with id: " + id);
         publisherService.delete(id);
         return ResponseEntity.ok().build();
+    }
+
+    @ExceptionHandler(PublisherNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    String publisherNotFoundHandler(PublisherNotFoundException ex) {
+        return ex.getMessage();
     }
 }
