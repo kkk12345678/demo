@@ -42,14 +42,19 @@ public class CategoryController {
 
     @PostMapping(value = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public CategoryDto save(
-            @RequestPart("name") String name,
-            @RequestPart("description") String description,
-            @RequestPart("img") MultipartFile image
+            @RequestPart(name = "name", required = true) String name,
+            @RequestPart(name = "description", required = false) String description,
+            @RequestPart(name = "img", required = false) MultipartFile image
     ) throws ValidationException {
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setName(name);
         categoryDto.setDescription(description);
-        categoryDto.setImg(imageService.save(image));
+        if (isNull(image)) {
+            categoryDto.setImg(null);
+        }
+        else {
+            categoryDto.setImg(imageService.save(image));
+        }
         log.info("Handling save category: " + categoryDto.getName());
         return categoryService.save(categoryDto);
     }
