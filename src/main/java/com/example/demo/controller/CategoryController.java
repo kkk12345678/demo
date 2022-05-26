@@ -1,14 +1,14 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.CategoryDto;
-import com.example.demo.exception.ForeignKeyConstraintSqlException;
-import com.example.demo.exception.NotFoundException;
+import com.example.demo.exception.CategoryNotFoundException;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.service.CategoryService;
 import com.example.demo.service.ImageService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,11 +33,11 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public CategoryDto findOne(@PathVariable Integer id) throws NotFoundException {
+    public CategoryDto findOne(@PathVariable Integer id) {
         log.info("Handling find category with id: " + id);
         CategoryDto categoryDto = categoryService.findById(id);
         if (isNull(categoryDto)) {
-            throw new NotFoundException("Category with id: " + id.toString() + " does not exist");
+            throw new CategoryNotFoundException(id);
         }
         return categoryDto;
     }
@@ -62,23 +62,15 @@ public class CategoryController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) throws NotFoundException, ForeignKeyConstraintSqlException {
+    public ResponseEntity<Void> delete(@PathVariable Integer id) throws CategoryNotFoundException {
         log.info("Handling delete category with id: " + id);
         categoryService.delete(id);
         return ResponseEntity.ok().build();
     }
 
-    @ExceptionHandler(NotFoundException.class)
+    @ExceptionHandler(CategoryNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String notFoundHandler(NotFoundException ex) {
+    String categoryNotFoundHandler(CategoryNotFoundException ex) {
         return ex.getMessage();
     }
-
-    @ExceptionHandler(ForeignKeyConstraintSqlException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    String foreignKeyConstraintSqlExceptionHandler(ForeignKeyConstraintSqlException ex) {
-        return ex.getMessage();
-    }
-
-
 }
