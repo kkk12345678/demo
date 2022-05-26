@@ -41,11 +41,11 @@ public class PublisherController {
         return publisherDto;
     }
 
-    @PostMapping(value = "/save", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping("/save")
     public PublisherDto save(
-            @RequestPart(name = "name") String name,
-            @RequestPart(name = "description", required = false) String description,
-            @RequestPart(name = "img", required = false) MultipartFile image
+            @RequestParam String name,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) MultipartFile image
     ) throws ValidationException {
         PublisherDto publisherDto = new PublisherDto();
         publisherDto.setName(name);
