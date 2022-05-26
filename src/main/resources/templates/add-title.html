@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Add title</title>
+</head>
+<body>
+<h1>Add new title</h1>
+<form action="http://localhost:8080/titles/save" method="post" enctype="multipart/form-data">
+    <label>Name:</label><input type="text" name="name"/><br>
+    <label>Description:</label><input type="text" name="description"/><br>
+    <label>Image:</label><input type="file" name="img"/><br>
+    <input type="hidden" name="categoryId" value="1">
+    <input type="hidden" name="publisherId" value="1">
+    <input type="submit" value="Save"/>
+</form>
+</body>
+</html>
