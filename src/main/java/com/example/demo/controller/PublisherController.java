@@ -1,14 +1,14 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.PublisherDto;
-import com.example.demo.exception.PublisherNotFoundException;
+import com.example.demo.exception.ForeignKeyConstraintSqlException;
+import com.example.demo.exception.NotFoundException;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.service.PublisherService;
 import com.example.demo.service.ImageService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,11 +32,11 @@ public class PublisherController {
     }
 
     @GetMapping("/{id}")
-    public PublisherDto findOne(@PathVariable Integer id) {
+    public PublisherDto findOne(@PathVariable Integer id) throws NotFoundException {
         log.info("Handling find publisher with id: " + id);
         PublisherDto publisherDto = publisherService.findById(id);
         if (isNull(publisherDto)) {
-            throw new PublisherNotFoundException(id);
+            throw new NotFoundException("Publisher with id: " + id.toString() + " does not exist");
         }
         return publisherDto;
     }
@@ -61,15 +61,21 @@ public class PublisherController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) throws PublisherNotFoundException {
+    public ResponseEntity<Void> delete(@PathVariable Integer id) throws NotFoundException, ForeignKeyConstraintSqlException {
         log.info("Handling delete publisher with id: " + id);
         publisherService.delete(id);
         return ResponseEntity.ok().build();
     }
 
-    @ExceptionHandler(PublisherNotFoundException.class)
+    @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String publisherNotFoundHandler(PublisherNotFoundException ex) {
+    String notFoundHandler(NotFoundException ex) {
+        return ex.getMessage();
+    }
+
+    @ExceptionHandler(ForeignKeyConstraintSqlException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    String foreignKeyConstraintSqlExceptionHandler(ForeignKeyConstraintSqlException ex) {
         return ex.getMessage();
     }
 }
