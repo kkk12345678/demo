@@ -1,7 +1,7 @@
 package com.example.demo.converter;
 
 import com.example.demo.dto.CategoryDto;
-import com.example.demo.entity.Category;
+import com.example.demo.model.Category;
 import org.springframework.stereotype.Component;
 
 @Component

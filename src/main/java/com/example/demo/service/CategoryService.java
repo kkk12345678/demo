@@ -2,14 +2,16 @@ package com.example.demo.service;
 
 import com.example.demo.converter.CategoryConverter;
 import com.example.demo.dto.CategoryDto;
-import com.example.demo.entity.Category;
-import com.example.demo.exception.CategoryNotFoundException;
+import com.example.demo.exception.ForeignKeyConstraintSqlException;
+import com.example.demo.exception.NotFoundException;
+import com.example.demo.model.Category;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.repository.CategoryRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +22,7 @@ import static java.util.Objects.isNull;
 public class CategoryService implements DtoService<CategoryDto> {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryRepository titleRepository;
     private final CategoryConverter categoryConverter;
 
 
@@ -31,10 +34,16 @@ public class CategoryService implements DtoService<CategoryDto> {
     }
 
     @Override
-    public void delete(Integer id) throws CategoryNotFoundException {
+    public void delete(Integer id) throws NotFoundException, ForeignKeyConstraintSqlException {
         categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryNotFoundException(id));
-        categoryRepository.deleteById(id);
+                .orElseThrow(() -> new NotFoundException("Category with id: " + id + " does not exist"));
+
+        try {
+            categoryRepository.deleteById(id);
+        }
+        catch (Exception e) {
+            throw new ForeignKeyConstraintSqlException("Unable to delete category with id:" + id + ". There are titles in this category.");
+        }
     }
 
     @Override
@@ -56,9 +65,9 @@ public class CategoryService implements DtoService<CategoryDto> {
     }
 
     @Override
-    public CategoryDto findById(Integer id) throws CategoryNotFoundException {
+    public CategoryDto findById(Integer id) throws NotFoundException {
         return categoryConverter.fromCategoryToCategoryDto(categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryNotFoundException(id)));
+                .orElseThrow(() -> new NotFoundException("Category with id: " + id + " does not exist")));
     }
 
     private void validateCategory(CategoryDto categoryDto) throws ValidationException {

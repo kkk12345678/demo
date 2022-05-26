@@ -1,8 +1,10 @@
 package com.example.demo.controller;
 
+import com.example.demo.exception.NotFoundException;
 import com.example.demo.service.ImageService;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -19,9 +21,14 @@ public class ImageController {
             method = RequestMethod.GET,
             produces = "image/jpeg"
     )
-    public @ResponseBody byte[] getImage(@PathVariable String filename) throws IOException {
+    public @ResponseBody byte[] getImage(@PathVariable String filename) throws IOException, NotFoundException {
         log.info("Handling get image: " + filename);
         return imageService.get(filename);
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    String notFoundHandler(NotFoundException ex) {
+        return ex.getMessage();
+    }
 }

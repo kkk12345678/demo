@@ -1,7 +1,7 @@
 package com.example.demo.converter;
 
 import com.example.demo.dto.PublisherDto;
-import com.example.demo.entity.Publisher;
+import com.example.demo.model.Publisher;
 import org.springframework.stereotype.Component;
 
 @Component
