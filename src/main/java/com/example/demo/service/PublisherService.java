@@ -2,8 +2,9 @@ package com.example.demo.service;
 
 import com.example.demo.converter.PublisherConverter;
 import com.example.demo.dto.PublisherDto;
-import com.example.demo.entity.Publisher;
-import com.example.demo.exception.PublisherNotFoundException;
+import com.example.demo.exception.ForeignKeyConstraintSqlException;
+import com.example.demo.exception.NotFoundException;
+import com.example.demo.model.Publisher;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.repository.PublisherRepository;
 import lombok.AllArgsConstructor;
@@ -28,10 +29,15 @@ public class PublisherService implements DtoService<PublisherDto> {
     }
 
     @Override
-    public void delete(Integer id) throws PublisherNotFoundException {
+    public void delete(Integer id) throws NotFoundException, ForeignKeyConstraintSqlException {
         publisherRepository.findById(id)
-                .orElseThrow(() -> new PublisherNotFoundException(id));
-        publisherRepository.deleteById(id);
+                .orElseThrow(() -> new NotFoundException("Publisher with id: " + id + " does not exist"));
+        try {
+            publisherRepository.deleteById(id);
+        }
+        catch (Exception e) {
+            throw new ForeignKeyConstraintSqlException("Unable to delete publisher with id:" + id + ". There are titles with this publisher.");
+        }
     }
 
     @Override
@@ -53,9 +59,9 @@ public class PublisherService implements DtoService<PublisherDto> {
     }
 
     @Override
-    public PublisherDto findById(Integer id) throws PublisherNotFoundException {
+    public PublisherDto findById(Integer id) throws NotFoundException {
         return publisherConverter.fromPublisherToPublisherDto(publisherRepository.findById(id)
-                .orElseThrow(() -> new PublisherNotFoundException(id)));
+                .orElseThrow(() -> new NotFoundException("Publisher with id: " + id + " does not exist")));
     }
 
     private void validatePublisher(PublisherDto publisherDto) throws ValidationException {
