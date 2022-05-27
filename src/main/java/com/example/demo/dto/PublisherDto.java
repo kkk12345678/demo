@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Setter(value = AccessLevel.PUBLIC)
 @Getter
-public class PublisherDto extends Dto {
+public class PublisherDto extends CatalogueDto {
     private Integer id;
     private String name;
     private String description;

@@ -1,6 +1,5 @@
 package com.example.demo.dto;
 
-
 import lombok.*;
 
 
@@ -9,9 +8,13 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Setter(value = AccessLevel.PUBLIC)
 @Getter
-public class CategoryDto extends CatalogueDto {
+public class UserDto {
     private Integer id;
-    private String name;
-    private String description;
-    private String img;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String password;
+    private String address;
+    private String refreshToken;
+    private String role;
 }

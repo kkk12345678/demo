@@ -13,7 +13,7 @@ import javax.persistence.*;
 @EqualsAndHashCode(callSuper = true)
 public class Title extends Catalogue {
     @ManyToOne(optional=false)
-    Category category;
+    private Category category;
     @ManyToOne(optional=false)
-    Publisher publisher;
+    private Publisher publisher;
 }

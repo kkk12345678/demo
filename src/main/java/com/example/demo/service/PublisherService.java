@@ -17,7 +17,7 @@ import static java.util.Objects.isNull;
 
 @AllArgsConstructor
 @Service
-public class PublisherService implements DtoService<PublisherDto> {
+public class PublisherService implements CatalogueService<PublisherDto> {
     private final PublisherRepository publisherRepository;
     private final PublisherConverter publisherConverter;
 

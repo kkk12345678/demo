@@ -16,7 +16,7 @@ import static java.util.Objects.isNull;
 
 @AllArgsConstructor
 @Service
-public class BookSetService implements DtoService<BookSetDto> {
+public class BookSetService implements CatalogueService<BookSetDto> {
 
     private final BookSetRepository bookSetRepository;
     private final BookSetConverter bookSetConverter;
