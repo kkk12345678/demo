@@ -11,7 +11,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,7 +18,7 @@ import static java.util.Objects.isNull;
 
 @AllArgsConstructor
 @Service
-public class CategoryService implements DtoService<CategoryDto> {
+public class CategoryService implements CatalogueService<CategoryDto> {
 
     private final CategoryRepository categoryRepository;
     private final CategoryRepository titleRepository;

@@ -1,7 +1,6 @@
 package com.example.demo.service;
 
 import com.example.demo.exception.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

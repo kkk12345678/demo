@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Setter(value = AccessLevel.PUBLIC)
 @Getter
-public class TitleDto extends Dto {
+public class TitleDto {
     private Integer id;
     private String name;
     private String description;

@@ -16,7 +16,7 @@ import static java.util.Objects.isNull;
 
 @AllArgsConstructor
 @Service
-public class TitleService implements DtoService<TitleDto> {
+public class TitleService implements CatalogueService<TitleDto> {
 
     private final TitleRepository titleRepository;
     private final TitleConverter titleConverter;
