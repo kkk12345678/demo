@@ -15,13 +15,13 @@ import java.util.List;
 import static java.util.Objects.isNull;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/users")
 @AllArgsConstructor
 @Log
 public class UserController {
     private final UserService userService;
 
-    //TODO
+
     @PostMapping("/signup")
     public UserDto save(
             @RequestParam String firstName,
@@ -43,13 +43,13 @@ public class UserController {
         return userService.save(userDto);
     }
 
-    @GetMapping("/users")
+    @GetMapping("/")
     public List<UserDto> findAll() {
         log.info("Handling find all users request");
         return userService.findAll();
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     public UserDto findOne(@PathVariable Integer id) throws NotFoundException {
         log.info("Handling find title with id: " + id);
         UserDto userDto = userService.findById(id);
@@ -57,5 +57,11 @@ public class UserController {
             throw new NotFoundException("User with id: " + id.toString() + " does not exist");
         }
         return userDto;
+    }
+
+    //TODO
+    @PostMapping("/login")
+    public UserDto auth() {
+        return null;
     }
 }
