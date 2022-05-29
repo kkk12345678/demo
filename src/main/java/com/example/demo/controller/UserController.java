@@ -41,6 +41,7 @@ public class UserController {
             @RequestParam(value = "address", defaultValue = "") String address,
             HttpServletResponse response
     ) throws NoSuchAlgorithmException, ValidationException {
+        userService.validateUserData(email, password);
         String hashedPassword = password.equals("") ? null : userService.hashPassword(password);
         UserDto userDto = new UserDto();
         userDto.setAddress(address);

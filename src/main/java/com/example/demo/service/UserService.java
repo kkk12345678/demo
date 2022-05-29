@@ -6,25 +6,33 @@ import com.example.demo.exception.NotFoundException;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
-import lombok.AllArgsConstructor;
+import org.apache.commons.validator.routines.EmailValidator;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 
-@AllArgsConstructor
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final UserConverter userConverter;
+    private final String passwordValidationRegex;
+    private final String passwordValidationText;
+    public UserService(UserRepository userRepository, UserConverter userConverter, Environment env) {
+        this.userRepository = userRepository;
+        this.userConverter = userConverter;
+        this.passwordValidationRegex = Objects.requireNonNull(env.getProperty("password.validation.regexp"));
+        this.passwordValidationText = Objects.requireNonNull(env.getProperty("password.validation.text"));
 
-
+    }
     public UserDto save(UserDto userDto) throws ValidationException {
         User user = userRepository.findByEmail(userDto.getEmail());
         if (isNull(user)) {
@@ -34,7 +42,6 @@ public class UserService {
     }
 
     public List<UserDto> findAll() {
-
         return userRepository
                 .findAll()
                 .stream()
@@ -75,5 +82,14 @@ public class UserService {
             hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
         }
         return new String(hexChars);
+    }
+
+    public void validateUserData(String email, String password) throws ValidationException {
+        if (!EmailValidator.getInstance().isValid(email)) {
+            throw new ValidationException("Email is not valid.");
+        }
+        if (!password.matches(passwordValidationRegex)) {
+            throw new ValidationException(passwordValidationText);
+        }
     }
 }
