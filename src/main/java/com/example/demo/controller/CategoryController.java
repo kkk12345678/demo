@@ -51,12 +51,7 @@ public class CategoryController {
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setName(name);
         categoryDto.setDescription(description);
-        if (isNull(image)) {
-            categoryDto.setImg(null);
-        }
-        else {
-            categoryDto.setImg(imageService.save(image));
-        }
+        categoryDto.setImg(imageService.save(image));
         log.info("Handling save category: " + categoryDto.getName());
         return categoryService.save(categoryDto);
     }

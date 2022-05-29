@@ -13,16 +13,24 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
+
 
 @Service
 public class ImageService {
 
     private final String imageDir;
+    private final String noImage;
+
 
     public ImageService(Environment env) {
         this.imageDir = Paths.get("").toAbsolutePath().normalize() + env.getProperty("image.dir");
+        this.noImage = env.getProperty("no.image");
     }
     public String save(MultipartFile image) {
+        if (isNull(image)) {
+            return noImage;
+        }
         final String filename = image.getOriginalFilename();
         String extension = getExtensionByStringHandling(filename);
         if (!extension.isEmpty()) {

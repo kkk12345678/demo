@@ -61,7 +61,7 @@ public class TitleController {
         titleDto.setDescription(description);
         titleDto.setCategory(categoryConverter.fromCategoryDtoToCategory(categoryService.findById(categoryId)));
         titleDto.setPublisher(publisherConverter.fromPublisherDtoToPublisher(publisherService.findById(publisherId)));
-        titleDto.setImg((isNull(image))? null : imageService.save(image));
+        titleDto.setImg(imageService.save(image));
         log.info("Handling save title: " + titleDto.getName());
         return titleService.save(titleDto);
     }

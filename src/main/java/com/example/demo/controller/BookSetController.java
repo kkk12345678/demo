@@ -57,7 +57,7 @@ public class BookSetController {
         bookSetDto.setTitle(titleConverter.fromTitleDtoToTitle(titleService.findById(titleId)));
         bookSetDto.setPrice15(price15);
         bookSetDto.setPrice30(price30);
-        bookSetDto.setImg((isNull(image))? null : imageService.save(image));
+        bookSetDto.setImg(imageService.save(image));
         log.info("Handling save bookset: " + bookSetDto.getName());
         return bookSetService.save(bookSetDto);
     }

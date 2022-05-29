@@ -50,12 +50,7 @@ public class PublisherController {
         PublisherDto publisherDto = new PublisherDto();
         publisherDto.setName(name);
         publisherDto.setDescription(description);
-        if (isNull(image)) {
-            publisherDto.setImg(null);
-        }
-        else {
-            publisherDto.setImg(imageService.save(image));
-        }
+        publisherDto.setImg(imageService.save(image));
         log.info("Handling save publisher: " + publisherDto.getName());
         return publisherService.save(publisherDto);
     }
