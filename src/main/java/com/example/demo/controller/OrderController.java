@@ -79,8 +79,8 @@ public class OrderController {
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String notFoundHandler(NotFoundException ex) {
-        return ex.getMessage();
+    String notFoundHandler(NotFoundException e) {
+        return e.getMessage();
     }
 
 }

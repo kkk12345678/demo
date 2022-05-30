@@ -3,51 +3,31 @@ package com.example.demo.service;
 import com.example.demo.converter.UserConverter;
 import com.example.demo.dto.UserDto;
 import com.example.demo.exception.NotFoundException;
-import com.example.demo.exception.ValidationException;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
-import org.apache.commons.validator.routines.EmailValidator;
-import org.springframework.core.env.Environment;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 
 @Service
+@AllArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final UserConverter userConverter;
-    private final String passwordValidationRegex;
-    private final String passwordValidationText;
-    public UserService(UserRepository userRepository, UserConverter userConverter, Environment env) {
-        this.userRepository = userRepository;
-        this.userConverter = userConverter;
-        this.passwordValidationRegex = Objects.requireNonNull(env.getProperty("password.validation.regexp"));
-        this.passwordValidationText = Objects.requireNonNull(env.getProperty("password.validation.text"));
 
-    }
-    public UserDto save(UserDto userDto) throws ValidationException {
-        User user = userRepository.findByEmail(userDto.getEmail());
-        if (isNull(user)) {
-            return userConverter.fromUserToUserDto(userRepository.save(userConverter.fromUserDtoToUser(userDto)));
-        }
-        throw new ValidationException("User with email: " + userDto.getEmail() + " already exists.");
+    public UserDto save(UserDto userDto) {
+        return userConverter.fromUserToUserDto(userRepository.save(userConverter.fromUserDtoToUser(userDto)));
     }
 
     public List<UserDto> findAll() {
-        return userRepository
-                .findAll()
-                .stream()
-                .map(userConverter::fromUserToUserDto)
-                .collect(Collectors.toList());
+        return userRepository.findAll().stream().map(userConverter::fromUserToUserDto).collect(Collectors.toList());
     }
+
     public void delete(Integer id) throws NotFoundException {
         userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Title with id: " + id + " does not exist"));
@@ -59,37 +39,19 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("User with id: " + id + " does not exist")));
     }
 
-    /*
     public UserDto findByEmail(String email) throws NotFoundException {
-        UserDto userDto = userConverter.fromUserToUserDto(userRepository.findByEmail(email));
-        if (isNull(userDto)) {
+        User user = userRepository.findByEmail(email);
+        if (isNull(user)) {
             throw new NotFoundException("User with email: " + email + " does not exist");
         }
-        return userDto;
+        return userConverter.fromUserToUserDto(user);
     }
 
-
-     */
-    public String hashPassword(String password) throws NoSuchAlgorithmException {
-        final MessageDigest digest = MessageDigest.getInstance("SHA3-256");
-        final byte[] bytes = digest.digest(
-                password.getBytes(StandardCharsets.UTF_8));
-        final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
-        char[] hexChars = new char[bytes.length * 2];
-        for (int j = 0; j < bytes.length; j++) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+    public UserDto findByRefreshToken(String token) throws NotFoundException {
+        User user = userRepository.findByRefreshToken(token);
+        if (isNull(user)) {
+            throw new NotFoundException("User not found");
         }
-        return new String(hexChars);
-    }
-
-    public void validateUserData(String email, String password) throws ValidationException {
-        if (!EmailValidator.getInstance().isValid(email)) {
-            throw new ValidationException("Email is not valid.");
-        }
-        if (!password.matches(passwordValidationRegex)) {
-            throw new ValidationException(passwordValidationText);
-        }
+        return userConverter.fromUserToUserDto(user);
     }
 }

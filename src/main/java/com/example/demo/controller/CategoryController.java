@@ -5,7 +5,7 @@ import com.example.demo.exception.ForeignKeyConstraintSqlException;
 import com.example.demo.exception.NotFoundException;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.service.CategoryService;
-import com.example.demo.service.ImageService;
+import com.example.demo.util.ImageUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
@@ -24,7 +24,7 @@ import static java.util.Objects.isNull;
 @Log
 public class CategoryController {
     private final CategoryService categoryService;
-    private final ImageService imageService;
+    private final ImageUtil imageUtil;
 
     @GetMapping("/all")
     public List<CategoryDto> findAll() {
@@ -51,7 +51,7 @@ public class CategoryController {
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setName(name);
         categoryDto.setDescription(description);
-        categoryDto.setImg(imageService.save(image));
+        categoryDto.setImg(imageUtil.save(image));
         log.info("Handling save category: " + categoryDto.getName());
         return categoryService.save(categoryDto);
     }
@@ -65,14 +65,14 @@ public class CategoryController {
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String notFoundHandler(NotFoundException ex) {
-        return ex.getMessage();
+    String notFoundHandler(NotFoundException e) {
+        return e.getMessage();
     }
 
     @ExceptionHandler(ForeignKeyConstraintSqlException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    String foreignKeyConstraintSqlExceptionHandler(ForeignKeyConstraintSqlException ex) {
-        return ex.getMessage();
+    String foreignKeyConstraintSqlExceptionHandler(ForeignKeyConstraintSqlException e) {
+        return e.getMessage();
     }
 
 

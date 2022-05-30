@@ -5,6 +5,7 @@ import com.example.demo.dto.BookSetDto;
 import com.example.demo.exception.NotFoundException;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.service.*;
+import com.example.demo.util.ImageUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,7 @@ public class BookSetController {
     private final BookSetService bookSetService;
     private final TitleService titleService;
     private final TitleConverter titleConverter;
-    private final ImageService imageService;
+    private final ImageUtil imageUtil;
 
     @GetMapping("/all")
     public List<BookSetDto> findAll() {
@@ -57,7 +58,7 @@ public class BookSetController {
         bookSetDto.setTitle(titleConverter.fromTitleDtoToTitle(titleService.findById(titleId)));
         bookSetDto.setPrice15(price15);
         bookSetDto.setPrice30(price30);
-        bookSetDto.setImg(imageService.save(image));
+        bookSetDto.setImg(imageUtil.save(image));
         log.info("Handling save bookset: " + bookSetDto.getName());
         return bookSetService.save(bookSetDto);
     }
@@ -71,7 +72,7 @@ public class BookSetController {
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String notFoundHandler(NotFoundException ex) {
-        return ex.getMessage();
+    String notFoundHandler(NotFoundException e) {
+        return e.getMessage();
     }
 }

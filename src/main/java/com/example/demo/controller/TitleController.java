@@ -6,7 +6,7 @@ import com.example.demo.dto.TitleDto;
 import com.example.demo.exception.NotFoundException;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.service.CategoryService;
-import com.example.demo.service.ImageService;
+import com.example.demo.util.ImageUtil;
 import com.example.demo.service.PublisherService;
 import com.example.demo.service.TitleService;
 import lombok.AllArgsConstructor;
@@ -30,7 +30,7 @@ public class TitleController {
     private final PublisherService publisherService;
     private final CategoryConverter categoryConverter;
     private final PublisherConverter publisherConverter;
-    private final ImageService imageService;
+    private final ImageUtil imageUtil;
 
     @GetMapping("/all")
     public List<TitleDto> findAll() {
@@ -61,7 +61,7 @@ public class TitleController {
         titleDto.setDescription(description);
         titleDto.setCategory(categoryConverter.fromCategoryDtoToCategory(categoryService.findById(categoryId)));
         titleDto.setPublisher(publisherConverter.fromPublisherDtoToPublisher(publisherService.findById(publisherId)));
-        titleDto.setImg(imageService.save(image));
+        titleDto.setImg(imageUtil.save(image));
         log.info("Handling save title: " + titleDto.getName());
         return titleService.save(titleDto);
     }
@@ -75,7 +75,7 @@ public class TitleController {
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String notFoundHandler(NotFoundException ex) {
-        return ex.getMessage();
+    String notFoundHandler(NotFoundException e) {
+        return e.getMessage();
     }
 }

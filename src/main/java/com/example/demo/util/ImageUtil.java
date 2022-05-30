@@ -1,8 +1,8 @@
-package com.example.demo.service;
+package com.example.demo.util;
 
 import com.example.demo.exception.NotFoundException;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -16,14 +16,14 @@ import java.util.UUID;
 import static java.util.Objects.isNull;
 
 
-@Service
-public class ImageService {
+@Component
+public class ImageUtil {
 
     private final String imageDir;
     private final String noImage;
 
 
-    public ImageService(Environment env) {
+    public ImageUtil(Environment env) {
         this.imageDir = Paths.get("").toAbsolutePath().normalize() + env.getProperty("image.dir");
         this.noImage = env.getProperty("no.image");
     }
