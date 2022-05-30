@@ -54,4 +54,8 @@ public class UserService {
         }
         return userConverter.fromUserToUserDto(user);
     }
+
+    public long count() {
+        return userRepository.count();
+    }
 }

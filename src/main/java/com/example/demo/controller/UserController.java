@@ -36,7 +36,6 @@ public class UserController {
 
 
 
-    //TODO different save user logic for different roles
     @PostMapping("/signup")
     public UserDto save(
             @RequestParam String firstName,
@@ -44,26 +43,20 @@ public class UserController {
             @RequestParam String email,
             @RequestParam(value = "password", defaultValue = "") String password,
             @RequestParam(value = "address", defaultValue = "") String address,
-            @RequestParam(value = "role", defaultValue = "USER") String role,
-
-            HttpServletResponse response
+            HttpServletRequest httpServletRequest,
+            HttpServletResponse httpServletResponse
     ) throws NoSuchAlgorithmException, ValidationException, NotFoundException {
         authenticationUtil.validateUserData(firstName, email, password);
-        try {
-            UserDto userDto = userService.findByEmail(email);
-            if (!isNull(userDto)) {
-                throw new ValidationException("User with email:" + email + " already exists");
-            }
-        } catch (NotFoundException ignored) {}
+        String role = getRoleForSave(httpServletRequest, httpServletResponse, email);
         String hashedPassword = authenticationUtil.hashPassword(password);
         Map<Integer, String> tokens = jwtTokenUtil.generateToken(firstName + " " + lastName, email, role);
         String refreshToken = tokens.get(JwtTokenUtil.REFRESH_TOKEN);
         UserDto userDto = new UserDto(firstName, lastName, email, hashedPassword, address, refreshToken, role);
-        setCookie(tokens, response);
+        setCookie(tokens, httpServletResponse);
         return userService.save(userDto);
     }
 
-    @GetMapping("/all")
+    @GetMapping("/")
     public List<UserDto> findAll(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws AuthorizationException {
         Claims claims = validateTokens(httpServletRequest, httpServletResponse);
         String role = (String) claims.get("role");
@@ -112,7 +105,6 @@ public class UserController {
         return userDto;
     }
 
-
     @PostMapping("/logout")
     public void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Cookie[] cookies = httpServletRequest.getCookies();
@@ -128,10 +120,7 @@ public class UserController {
         }
     }
 
-
-
-
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public String delete(
             @PathVariable Integer id,
             HttpServletResponse httpServletResponse,
@@ -144,6 +133,55 @@ public class UserController {
             return "User with id :" + id + " was successfully deleted.";
         }
         throw new AuthorizationException("Only superadmin can delete users.");
+    }
+
+    @PutMapping("/{id}")
+    public UserDto update(@PathVariable Integer id,
+                         @RequestParam String firstName,
+                         @RequestParam(value = "lastName", defaultValue = "") String lastName,
+                         @RequestParam(value = "password", defaultValue = "") String password,
+                         @RequestParam(value = "address", defaultValue = "") String address,
+                         HttpServletResponse httpServletResponse,
+                         HttpServletRequest httpServletRequest
+    ) throws NotFoundException, AuthorizationException, NoSuchAlgorithmException {
+        Claims claims = validateTokens(httpServletRequest, httpServletResponse);
+        String role = (String) claims.get("role");
+        String email = (String) claims.get("email");
+        UserDto userDto = userService.findById(id);
+        if (!role.equals(String.valueOf(ERole.USER)) || email.equals(userDto.getEmail())) {
+            userDto.setFirstName(firstName);
+            userDto.setLastName(lastName);
+            userDto.setPassword(authenticationUtil.hashPassword(password));
+            userDto.setAddress(address);
+            return userService.save(userDto);
+        }
+        throw new AuthorizationException("User can edit only own account.");
+    }
+
+    private String getRoleForSave(
+            HttpServletRequest httpServletRequest,
+            HttpServletResponse httpServletResponse,
+            String email
+    ) {
+        if (userService.count() == 0L) {
+            return String.valueOf(ERole.SUPERADMIN);
+        }
+        try {
+            UserDto userDto = userService.findByEmail(email);
+            if (!isNull(userDto)) {
+                throw new ValidationException("User with email:" + email + " already exists");
+            }
+        } catch (NotFoundException | ValidationException ignored) {}
+        try {
+            Claims claims = validateTokens(httpServletRequest, httpServletResponse);
+            String requestRole = (String) claims.get("role");
+            if (requestRole.equals(String.valueOf(ERole.SUPERADMIN))) {
+                return String.valueOf(ERole.ADMIN);
+            }
+        } catch (AuthorizationException e) {
+            return String.valueOf(ERole.USER);
+        }
+        return "";
     }
 
     private void setCookie(Map<Integer, String> tokens, HttpServletResponse httpServletResponse) {
@@ -188,27 +226,18 @@ public class UserController {
             throw new AuthorizationException(e.getMessage());
         }
     }
+
+    //Exception handlers. Simply put error message to response
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    String validationExceptionHandler(ValidationException e) {
-        return e.getMessage();
-    }
-
+    String validationExceptionHandler(ValidationException e) { return e.getMessage(); }
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String notFoundHandler(NotFoundException e) {
-        return e.getMessage();
-    }
-
+    String notFoundHandler(NotFoundException e) { return e.getMessage(); }
     @ExceptionHandler({InvalidPasswordException.class, AuthorizationException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    String unAuthorizedHandler(Exception e) {
-        return e.getMessage();
-    }
-
+    String unAuthorizedHandler(Exception e) { return e.getMessage(); }
     @ExceptionHandler(NoSuchAlgorithmException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    String noSuchAlgorithmHandler(Exception e) {
-        return e.getMessage();
-    }
+    String noSuchAlgorithmHandler(Exception e) { return e.getMessage(); }
 }
